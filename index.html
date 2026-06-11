@@ -16,44 +16,58 @@
             flex-direction: column; 
             gap: 15px; 
             background: #f4f4f9;
+            align-items: center; /* Centers elements horizontally */
+        }
+        h2 {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 0;
         }
         textarea { 
             width: 100%;
-            height: 350px; 
+            max-width: 600px; /* Limits width so it doesn't span too wide */
+            height: 260px;    /* Moderately sized height (longer than 200px, shorter than 350px) */
             font-family: monospace; 
             padding: 12px; 
             border-radius: 8px; 
             border: 1px solid #ccc;
+            box-sizing: border-box;
         }
         .btn-row { 
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); 
             gap: 10px; 
+            width: 100%;
+            max-width: 600px;
         }
-        button { 
+        button, .file-label { 
+            font-family: -apple-system, sans-serif;
+            font-size: 13.3333px; 
+            font-weight: bold; 
             padding: 15px;
             cursor: pointer; 
             border: none; 
             border-radius: 8px; 
-            font-weight: bold; 
             color: white;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
         }
-        button:active { opacity: 0.85; transform: scale(0.98);
+        button:active, .file-label:active { 
+            opacity: 0.85; 
+            transform: scale(0.98);
         }
 
         /* Color-coded buttons */
-        #btn-paste       { background: #1e293b;
-        }   /* Black / Dark Slate */
-        #btn-copy        { background: #64748b;
-        }   /* Slate */
-        #btn-run         { background: #2563eb;
-        }   /* Blue */
-        #btn-paste-run   { background: #16a34a;
-        }   /* Green */
-        #btn-download    { background: #9333ea;
-        }   /* Purple */
-        #btn-show-icon   { background: #ea580c;
-        }   /* Orange */
+        #btn-paste       { background: #1e293b; }   /* Black / Dark Slate */
+        #btn-run         { background: #2563eb; }   /* Blue */
+        #btn-paste-run   { background: #16a34a; }   /* Green */
+        #btn-copy        { background: #64748b; }   /* Slate */
+        #btn-download    { background: #9333ea; }   /* Purple */
+        .file-label      { background: #475569; }   /* Medium Slate for Upload */
+        #btn-show-icon   { background: #ea580c; }   /* Orange */
 
         #icon-result {
             display: flex;
@@ -64,6 +78,9 @@
             border-radius: 8px;
             border: 1px solid #ddd;
             min-height: 80px;
+            width: 100%;
+            max-width: 600px;
+            box-sizing: border-box;
         }
         #icon-result img {
             max-width: 128px;
@@ -77,6 +94,9 @@
             margin: 0;
             align-self: center;
         }
+        #fileInput {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -87,10 +107,14 @@
     <div class="btn-row">
         <button id="btn-paste" onclick="pasteClipboard()">Paste</button>
         <button id="btn-run" onclick="runTest()">Run</button>
-        <button id="btn-copy" onclick="copyToClipboard()">Copy</button>
         <button id="btn-paste-run" onclick="pasteAndRun()">Paste + Run</button>
-        <button id="btn-show-icon" onclick="showIcon()">Show Icon</button>
+        <button id="btn-copy" onclick="copyToClipboard()">Copy</button>
         <button id="btn-download" onclick="downloadFile()">Download</button>
+        
+        <label for="fileInput" class="file-label">Upload</label>
+        <input type="file" id="fileInput" accept=".html,.txt" onchange="loadLocalFile(this)">
+        
+        <button id="btn-show-icon" onclick="showIcon()">Show Icon</button>
     </div>
 
    
@@ -111,10 +135,24 @@
             }
         }
 
+        // Maintain compliance with source function logic
         function copyToClipboard() {
             codeWindow.select();
             document.execCommand('copy');
             alert("Code copied to clipboard!");
+        }
+
+        function loadLocalFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                codeWindow.value = e.target.result;
+                runTest();
+                input.value = '';
+            };
+            reader.readAsText(file);
         }
 
         function downloadFile() {
