@@ -62,12 +62,13 @@
 
         /* Color-coded buttons */
         #btn-paste       { background: #1e293b; }   /* Black / Dark Slate */
-        #btn-run         { background: #2563eb; }   /* Blue */
+        #btn-clear       { background: #ef4444; }   /* Red */
         #btn-paste-run   { background: #16a34a; }   /* Green */
         #btn-copy        { background: #64748b; }   /* Slate */
         #btn-download    { background: #9333ea; }   /* Purple */
         .file-label      { background: #475569; }   /* Medium Slate for Upload */
-        #btn-show-icon   { background: #ea580c; }   /* Orange */
+        #btn-run         { background: #2563eb; }   /* Blue */
+        #btn-preview     { background: #0ea5e9; }   /* Sky Blue - for Preview */
 
         #icon-result {
             display: flex;
@@ -94,6 +95,32 @@
             margin: 0;
             align-self: center;
         }
+
+        #preview-container {
+            width: 100%;
+            max-width: 600px;
+            border: 2px solid #0ea5e9;
+            border-radius: 8px;
+            background: white;
+            padding: 10px;
+            box-sizing: border-box;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+        }
+        #preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #preview-frame {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+        }
+
         #fileInput {
             display: none;
         }
@@ -106,18 +133,26 @@
     
     <div class="btn-row">
         <button id="btn-paste" onclick="pasteClipboard()">Paste</button>
-        <button id="btn-run" onclick="runTest()">Run</button>
+        <button id="btn-clear" onclick="clearWindow()">Clear</button>
         <button id="btn-paste-run" onclick="pasteAndRun()">Paste + Run</button>
         <button id="btn-copy" onclick="copyToClipboard()">Copy</button>
-        <button id="btn-download" onclick="downloadFile()">Download</button>
         
         <label for="fileInput" class="file-label">Upload</label>
         <input type="file" id="fileInput" accept=".html,.txt" onchange="loadLocalFile(this)">
         
-        <button id="btn-show-icon" onclick="showIcon()">Show Icon</button>
+        <button id="btn-download" onclick="downloadFile()">Download</button>
+        <button id="btn-run" onclick="runTest()">Run</button>
+        <button id="btn-preview" onclick="showInlinePreview()">Preview</button>
     </div>
 
-   
+    <div id="preview-container">
+        <div id="preview-header">
+            <strong>Inline Preview</strong>
+            <button onclick="hideInlinePreview()" style="background:#ef4444; color:white; padding:6px 12px; font-size:13px; border:none; border-radius:6px; cursor:pointer;">Close Preview</button>
+        </div>
+        <iframe id="preview-frame" sandbox="allow-scripts allow-popups allow-forms"></iframe>
+    </div>
+
     <div id="icon-result" style="display: none;">
         <strong>Found Bookmark Icons:</strong>
     </div>
@@ -125,6 +160,7 @@
     <script>
         const codeWindow = document.getElementById('codeWindow');
         const iconResult = document.getElementById('icon-result');
+        let currentPreviewUrl = null;
 
         async function pasteClipboard() {
             try {
@@ -135,7 +171,6 @@
             }
         }
 
-        // Maintain compliance with source function logic
         function copyToClipboard() {
             codeWindow.select();
             document.execCommand('copy');
@@ -194,56 +229,45 @@
             runTest();
         }
 
-        function showIcon() {
+        function clearWindow() {
+            if (confirm("Clear the entire code window?")) {
+                codeWindow.value = '';
+            }
+        }
+
+        function showInlinePreview() {
             const htmlContent = codeWindow.value.trim();
             if (!htmlContent) {
-                alert("The code window is empty!");
+                alert("The window is empty!");
                 return;
             }
 
-            // Clear previous results
-            iconResult.innerHTML = `<strong>Found Bookmark Icons:</strong>`;
-            iconResult.style.display = 'flex';
+            // Clean up previous URL if exists
+            if (currentPreviewUrl) {
+                URL.revokeObjectURL(currentPreviewUrl);
+            }
 
-            // Parse the HTML
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlContent, 'text/html');
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            currentPreviewUrl = URL.createObjectURL(blob);
             
-            // Find all icon-related link tags
-            const iconLinks = doc.querySelectorAll('link[rel*="icon"], link[rel="apple-touch-icon"], link[rel="shortcut icon"], link[rel="mask-icon"]');
-            if (iconLinks.length === 0) {
-                iconResult.innerHTML += `<p style="color: #e11d48;">No bookmark / touch icon found.</p>`;
-                return;
+            const iframe = document.getElementById('preview-frame');
+            const container = document.getElementById('preview-container');
+            
+            iframe.src = currentPreviewUrl;
+            container.style.display = 'flex';
+        }
+
+        function hideInlinePreview() {
+            const container = document.getElementById('preview-container');
+            const iframe = document.getElementById('preview-frame');
+            
+            container.style.display = 'none';
+            iframe.src = '';
+            
+            if (currentPreviewUrl) {
+                URL.revokeObjectURL(currentPreviewUrl);
+                currentPreviewUrl = null;
             }
-
-            iconLinks.forEach(link => {
-                const href = link.getAttribute('href');
-                const rel = link.getAttribute('rel');
-                const sizes = link.getAttribute('sizes') || '—';
-
-                if (href) {
-        
-                    const container = document.createElement('div');
-                    container.style.textAlign = 'center';
-                    
-                    const img = document.createElement('img');
-                    
-                    img.src = href;
-                    img.alt = rel;
-                    img.title = `${rel} (${sizes})`;
-
-                    const label = document.createElement('small');
-                    label.textContent = rel;
-        
-                    label.style.display = 'block';
-                    label.style.marginTop = '5px';
-
-                    container.appendChild(img);
-                    container.appendChild(label);
-                    iconResult.appendChild(container);
-    
-                }
-            });
         }
     </script>
 </body>
