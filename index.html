@@ -10,43 +10,50 @@
 
     <style>
         body { 
-            font-family: -apple-system, sans-serif; 
+            font-family: -apple-system, sans-serif;
             padding: 20px; 
             display: flex; 
             flex-direction: column; 
             gap: 15px; 
-            background: #f4f4f9; 
+            background: #f4f4f9;
         }
         textarea { 
-            width: 100%; 
+            width: 100%;
             height: 350px; 
             font-family: monospace; 
             padding: 12px; 
             border-radius: 8px; 
-            border: 1px solid #ccc; 
+            border: 1px solid #ccc;
         }
         .btn-row { 
-            display: grid; 
+            display: grid;
             grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); 
             gap: 10px; 
         }
         button { 
-            padding: 15px; 
+            padding: 15px;
             cursor: pointer; 
             border: none; 
             border-radius: 8px; 
             font-weight: bold; 
-            color: white; 
+            color: white;
         }
-        button:active { opacity: 0.85; transform: scale(0.98); }
+        button:active { opacity: 0.85; transform: scale(0.98);
+        }
 
         /* Color-coded buttons */
-        #btn-paste       { background: #1e293b; }   /* Black / Dark Slate */
-        #btn-copy        { background: #64748b; }   /* Slate */
-        #btn-run         { background: #2563eb; }   /* Blue */
-        #btn-paste-run   { background: #16a34a; }   /* Green */
-        #btn-download    { background: #9333ea; }   /* Purple */
-        #btn-show-icon   { background: #ea580c; }   /* Orange */
+        #btn-paste       { background: #1e293b;
+        }   /* Black / Dark Slate */
+        #btn-copy        { background: #64748b;
+        }   /* Slate */
+        #btn-run         { background: #2563eb;
+        }   /* Blue */
+        #btn-paste-run   { background: #16a34a;
+        }   /* Green */
+        #btn-download    { background: #9333ea;
+        }   /* Purple */
+        #btn-show-icon   { background: #ea580c;
+        }   /* Orange */
 
         #icon-result {
             display: flex;
@@ -79,14 +86,14 @@
     
     <div class="btn-row">
         <button id="btn-paste" onclick="pasteClipboard()">Paste</button>
-        <button id="btn-copy" onclick="copyToClipboard()">Copy</button>
         <button id="btn-run" onclick="runTest()">Run</button>
+        <button id="btn-copy" onclick="copyToClipboard()">Copy</button>
         <button id="btn-paste-run" onclick="pasteAndRun()">Paste + Run</button>
-        <button id="btn-download" onclick="downloadFile()">Download</button>
         <button id="btn-show-icon" onclick="showIcon()">Show Icon</button>
+        <button id="btn-download" onclick="downloadFile()">Download</button>
     </div>
 
-    <!-- Result area for icons -->
+   
     <div id="icon-result" style="display: none;">
         <strong>Found Bookmark Icons:</strong>
     </div>
@@ -122,7 +129,6 @@
             const timestamp = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
             
             const fileName = `${title}_${timestamp}.html`;
-            
             const blob = new Blob([content], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             
@@ -167,7 +173,6 @@
             
             // Find all icon-related link tags
             const iconLinks = doc.querySelectorAll('link[rel*="icon"], link[rel="apple-touch-icon"], link[rel="shortcut icon"], link[rel="mask-icon"]');
-            
             if (iconLinks.length === 0) {
                 iconResult.innerHTML += `<p style="color: #e11d48;">No bookmark / touch icon found.</p>`;
                 return;
@@ -179,22 +184,26 @@
                 const sizes = link.getAttribute('sizes') || '—';
 
                 if (href) {
+        
                     const container = document.createElement('div');
                     container.style.textAlign = 'center';
                     
                     const img = document.createElement('img');
+                    
                     img.src = href;
                     img.alt = rel;
                     img.title = `${rel} (${sizes})`;
 
                     const label = document.createElement('small');
                     label.textContent = rel;
+        
                     label.style.display = 'block';
                     label.style.marginTop = '5px';
 
                     container.appendChild(img);
                     container.appendChild(label);
                     iconResult.appendChild(container);
+    
                 }
             });
         }
