@@ -97,8 +97,8 @@
         }
 
         #preview-container {
-            width: 100%;
-            max-width: 600px;
+            width: 393px;
+            max-width: 100%;
             border: 2px solid #0ea5e9;
             border-radius: 8px;
             background: white;
@@ -107,6 +107,7 @@
             display: none;
             flex-direction: column;
             gap: 8px;
+            margin: 0 auto;
         }
         #preview-header {
             display: flex;
@@ -115,7 +116,7 @@
         }
         #preview-frame {
             width: 100%;
-            height: 500px;
+            height: 852px;
             border: 1px solid #ddd;
             border-radius: 4px;
             background: white;
@@ -133,7 +134,7 @@
     
     <div class="btn-row">
         <button id="btn-paste" onclick="pasteClipboard()">Paste</button>
-        <button id="btn-clear" onclick="clearWindow()">Clear</button>
+        <button id="btn-run" onclick="runTest()">Run</button>
         <button id="btn-paste-run" onclick="pasteAndRun()">Paste + Run</button>
         <button id="btn-copy" onclick="copyToClipboard()">Copy</button>
         
@@ -141,7 +142,7 @@
         <input type="file" id="fileInput" accept=".html,.txt" onchange="loadLocalFile(this)">
         
         <button id="btn-download" onclick="downloadFile()">Download</button>
-        <button id="btn-run" onclick="runTest()">Run</button>
+        <button id="btn-clear" onclick="clearWindow()">Clear</button>
         <button id="btn-preview" onclick="showInlinePreview()">Preview</button>
     </div>
 
